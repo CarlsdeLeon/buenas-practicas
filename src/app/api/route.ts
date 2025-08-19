@@ -4,6 +4,7 @@ import PostRegister from '@/utils/post-register';
 import PostFinder from '@/utils/post-finder';
 import PostUpdater from '@/utils/post-updater';
 import PostRepository from '@/utils/post-repository';
+import PostDeleter from '@/utils/post-deleter';
 
 export async function GET(request: NextRequest) {
     try {
@@ -67,5 +68,20 @@ export async function PUT(
         return NextResponse.json({ 
             error: error instanceof Error ? error.message : 'Failed to update post'
         });
+    }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const repository = new PostgresPostRepository();
+        const deleter = new PostDeleter(repository);
+        
+        await deleter.execute(params.id);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        return NextResponse.json({ 
+            error: error instanceof Error ? error.message : 'Failed to delete post'
+        }, { status: 400 });
     }
 }
