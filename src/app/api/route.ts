@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
         const data = await request.json();
 
         const repository = new PostgresPostRepository();
-        await repository.save(data.title, data.description, data.author);
 
         return NextResponse.json({
             message: "saved successfully",
