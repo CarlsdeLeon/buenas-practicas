@@ -1,8 +1,9 @@
 import { Sql } from 'postgres';
 import postgres from 'postgres';
 import Post from './post'
+import PostRepository from './post-repository';
 
-export default class PostgresPostRepository {
+export default class PostgresPostRepository  implements PostRepository {
     private readonly sql: Sql;
     constructor() { 
         const connectionString =
@@ -12,27 +13,68 @@ export default class PostgresPostRepository {
 
     async save(post: Post): Promise<void> {
         try {
+            const id = post.id;
             const title = post.title.value
             const description = post.description.value
             const author = post.author.value
             await this
-            .sql`INSERT INTO posts (
+            .sql`INSERT INTO posts (id,
             title, 
             description, 
             author
-            ) VALUES (${title}, ${description}, ${author});`;
+            ) VALUES (${id}, ${title}, ${description}, ${author});`;
         } catch {
             throw new Error('Failed to save post to database');
         }
     }
 
     async findAll(): Promise<Post[]> {
-        const posts = await this.sql`
-            SELECT * FROM posts ORDER BY created_at DESC
-        `;
-        
-        return posts.map(row => 
-            Post.create(row.title, row.description, row.author)
-        );
+        try {
+            const posts = await this.sql`
+                SELECT * FROM posts ORDER BY created_at DESC
+            `;
+            
+            return posts.map(row => 
+                new Post(row.id, row.title, row.description, row.author)
+            );
+        } catch {
+            throw new Error('Failed to fetch posts');
+        }
     }
+
+    async findById(id: string): Promise<Post | null> {
+        try {
+            const [post] = await this.sql`
+                SELECT * FROM posts WHERE id = ${id}
+            `;
+            
+            return post ? new Post(post.id, post.title, post.description, post.author) : null;
+        } catch {
+            throw new Error('Failed to find post');
+        }
+    }
+
+    async update(post: Post): Promise<void> {
+        try {
+            await this.sql`
+                UPDATE posts 
+                SET title = ${post.title.value}, 
+                    description = ${post.description.value}
+                WHERE id = ${post.id}
+            `;
+        } catch {
+            throw new Error('Failed to update post');
+        }
+    }
+
+    async delete(id: string): Promise<void> {
+        try {
+            await this.sql`
+                DELETE FROM posts WHERE id = ${id}
+            `;
+        } catch {
+            throw new Error('Failed to delete post');
+        }
+    }
+
 }
