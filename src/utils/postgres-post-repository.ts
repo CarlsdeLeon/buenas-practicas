@@ -25,4 +25,14 @@ export default class PostgresPostRepository {
             throw new Error('Failed to save post to database');
         }
     }
+
+    async findAll(): Promise<Post[]> {
+        const posts = await this.sql`
+            SELECT * FROM posts ORDER BY created_at DESC
+        `;
+        
+        return posts.map(row => 
+            Post.create(row.title, row.description, row.author)
+        );
+    }
 }
