@@ -1,5 +1,5 @@
 import Post from "./post"
-import PostgresPostRepository from "./postgres-post-repository";
+import PostgresPostRepository from "./postgres-post-register";
 
 export default class PostRegister {
     private readonly repository: PostgresPostRepository;
@@ -8,7 +8,7 @@ export default class PostRegister {
         this.repository =  repository;
     }
     public async run(title: string, description: string, author: string): Promise<void> {
-        const post= new Post(title, description, author);
+        const post= Post.create(title, description, author);
         await this.repository.save(post);
     }
     

@@ -12,9 +12,9 @@ export default class PostgresPostRepository {
 
     async save(post: Post): Promise<void> {
         try {
-            const title = post.title
-            const description = post.description
-            const author = post.author
+            const title = post.title.value
+            const description = post.description.value
+            const author = post.author.value
             await this
             .sql`INSERT INTO posts (
             title, 

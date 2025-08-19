@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import PostgresPostRepository from '@/utils/postgres-post-repository';
+import PostgresPostRepository from '@/utils/postgres-post-register';
 
 export async function POST(request: NextRequest) {
     try {
