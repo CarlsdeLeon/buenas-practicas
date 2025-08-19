@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import PostgresPostRepository from '@/utils/postgres-post-repository';
 
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
 
-        if (data.title.length < 5 || data.title.length > 50) {
-            throw new Error("title must be between 5 and 50 characters long");
-        }
-
-        if (!data.description || typeof data.description !== "string") {
-            throw new Error("description is required and must be a string");
-        }
-
-        
-        if (data.author.length < 5 || data.author.length > 30) {
-            throw new Error("author must be between 5 and 30 characters long");
-        }
+        const repository = new PostgresPostRepository();
+        await repository.save(data.title, data.description, data.author);
 
         return NextResponse.json({
-            message: "validated successfully",
+            message: "saved successfully",
         });
 
     } catch (error) {
