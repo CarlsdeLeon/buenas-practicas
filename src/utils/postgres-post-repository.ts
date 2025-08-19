@@ -12,8 +12,15 @@ export default class PostgresPostRepository {
 
     async save(post: Post): Promise<void> {
         try {
+            const title = post.title
+            const description = post.description
+            const author = post.author
             await this
-            .sql`INSERT INTO posts (title, description, author) VALUES (${post.title}, ${post.description}, ${post.author});`;
+            .sql`INSERT INTO posts (
+            title, 
+            description, 
+            author
+            ) VALUES (${title}, ${description}, ${author});`;
         } catch {
             throw new Error('Failed to save post to database');
         }
